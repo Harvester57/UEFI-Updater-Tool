@@ -1,0 +1,7 @@
+# DO NOT REMOVE THIS FILE!!!
+# Supported Device ID List SATA Marvell
+# Pattern Device ID
+9191 9191
+9291 9192
+A191 91A1
+A291 91A2

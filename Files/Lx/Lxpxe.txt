@@ -1,0 +1,8 @@
+# DO NOT REMOVE THIS FILE!!!
+# Supported Device ID List Boot Agent
+# Pattern Device ID
+9110 1091
+A110 10A1
+91E0 E091
+A1E0 E0A1
+B1E0 E0B1

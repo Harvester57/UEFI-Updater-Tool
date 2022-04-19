@@ -1,0 +1,7 @@
+#Do not remove this file.
+#This file is for updating microcodes for MSI x299.
+#
+#To avoid a possible error - "Error in Saving",
+# set '#' at the beginning of the line that you turn off.
+#
+

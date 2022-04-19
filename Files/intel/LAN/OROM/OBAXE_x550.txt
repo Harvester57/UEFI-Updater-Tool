@@ -1,0 +1,6 @@
+# DO NOT REMOVE THIS FILE!!!
+# Supported Device ID List Boot Agent XE 550
+# Pattern Device ID
+6215 1562
+6315 1563
+D115 15D1
