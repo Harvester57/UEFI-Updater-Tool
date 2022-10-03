@@ -7,7 +7,7 @@ Intel, AMD, VIA & Freescale Microcode Extractor
 Copyright (C) 2016-2022 Plato Mavropoulos
 """
 
-title = 'MC Extractor v1.74.0'
+title = 'MC Extractor v1.76.0'
 
 import sys
 
@@ -365,8 +365,8 @@ class AMD_MC_Header(ctypes.LittleEndianStructure) :
         ('Month',                    uint8_t),        # 0x03
         ('UpdateRevision',            uint32_t),        # 0x04
         ('LoaderID',                uint16_t),        # 0x08 00-05 80
-        ('DataSize',                uint8_t),        # 0x0A 00 or 10 or 20
-        ('InitializationFlag',        uint8_t),        # 0x0B 00 or 01
+        ('DataSize',                uint8_t),        # 0x0A 00 or 10 or 20 or 2nd byte of AM5 DataSize (?)
+        ('InitializationFlag',        uint8_t),        # 0x0B 00 or 01 or 1st byte of AM5 DataSize (?)
         ('DataChecksum',            uint32_t),        # 0x0C OEM validation only
         ('NorthBridgeVEN_ID',        uint16_t),        # 0x10 0000 or 1022
         ('NorthBridgeDEV_ID',        uint16_t),        # 0x12
@@ -614,7 +614,7 @@ def show_exception_and_exit(exc_type, exc_value, tb) :
     sys.exit(-1)
 
 def report_msg(msg_len) :
-    return ' You can help this project by\n%squickly uploading it to https://mega.nz/megadrop/pRUG54UU1bs/. Thank you!' % (' ' * msg_len)
+    return f' You can help this project\n{" " * msg_len}by sharing it at https://win-raid.com forum. Thank you!'
     
 def adler32(data, iv=1) :
     return zlib.adler32(data, iv) & 0xFFFFFFFF
@@ -1096,8 +1096,8 @@ if param.get_last :
 # Intel - HeaderRev 01, Year 1993-2024, Day 01-31, Month 01-12, CPUID xxxxxx00, LoaderRev 00-01, PlatformIDs 000000xx, DataSize xxxxxx00, TotalSize xxxxxx00, Reserved1
 pat_int = re.compile(br'\x01\x00{3}.{4}(([\x00-\x09\x10-\x19\x20-\x24]\x20)|([\x93-\x99]\x19))[\x01-\x09\x10-\x19\x20-\x29\x30-\x31][\x01-\x09\x10-\x12].{3}\x00.{4}[\x01\x00]\x00{3}.\x00{3}.{3}\x00.{3}\x00{13}', re.DOTALL)
 
-# AMD - Year 20xx, Month 01-13, LoaderID 00-06, DataSize 00|10|20, InitFlag 00-01, NorthBridgeVEN_ID 0000|1022, SouthBridgeVEN_ID 0000|1022, BiosApiREV_ID 00-01, Reserved 00|AA
-pat_amd = re.compile(br'\x20[\x01-\x09\x10-\x19\x20-\x29\x30-\x31][\x01-\x09\x10-\x13].{4}[\x00-\x06]\x80[\x00\x20\x10][\x00\x01].{4}((\x00{2})|(\x22\x10)).{2}((\x00{2})|(\x22\x10)).{6}[\x00\x01](\x00{3}|\xAA{3})', re.DOTALL)
+# AMD - Year 20xx, Month 01-13, LoaderID 00-06, NorthBridgeVEN_ID 0000|1022, SouthBridgeVEN_ID 0000|1022, BiosApiREV_ID 00-01, Reserved 00|AA
+pat_amd = re.compile(br'\x20[\x01-\x09\x10-\x19\x20-\x29\x30-\x31][\x01-\x09\x10-\x13].{4}[\x00-\x06]\x80.{6}((\x00{2})|(\x22\x10)).{2}((\x00{2})|(\x22\x10)).{6}[\x00\x01](\x00{3}|\xAA{3})', re.DOTALL)
 
 # VIA - Signature RRAS, Year 2006-2024 (0x07D6-0x07E8), Day 01-31 (0x01-0x1F), Month 01-12 (0x01-0x0C), LoaderRev 01, Reserved, DataSize xxxxxx00, TotalSize xxxxxx00
 pat_via = re.compile(br'\x52\x52\x41\x53.{4}[\xD6-\xE8]\x07[\x01-\x1F][\x01-\x0C].{3}\x00.{4}\x01\x00{3}.{7}\x00.{3}\x00', re.DOTALL)
@@ -1395,7 +1395,7 @@ for in_file in source :
         if param.build_repo :
             mc_repo_id = 'Intel_%0.5X_%0.2X' % (cpu_id, plat) # Unique Intel Repo Entry: CPUID + Platform
             
-            if in_file not in temp_mc_paths and rel_file == 'PRD' and cpu_id != 0 and is_latest and mc_repo_id not in repo_included  :
+            if in_file not in temp_mc_paths and rel_file == 'PRD' and cpu_id not in [0,0x506C0] and is_latest and mc_repo_id not in repo_included  :
                 build_mc_repo('INTEL', mc_name)
                 repo_included.append(mc_repo_id)
             
@@ -1526,7 +1526,7 @@ for in_file in source :
         elif cpu_id[2:4] in ['68','69'] : mc_len = 0x980
         elif cpu_id[2:4] in ['70','73'] : mc_len = 0xD60
         elif cpu_id[2:4] in ['80','81','82','83','85','86','87'] : mc_len = 0xC80
-        elif cpu_id[2:4] in ['A0','A1','A2','A3','A4','A5'] : mc_len = 0x15C0
+        elif cpu_id[2:4] in ['A0','A1','A2','A3','A4','A5','A6'] : mc_len = 0x15C0
         else :
             msg_a.append(col_r + '\nError: Skipped potential AMD Microcode #%d at 0x%X, unknown %s size!%s' % (mc_nr, mc_bgn, cpu_id, report_msg(7)) + col_e)
             copy_file_with_warn()
