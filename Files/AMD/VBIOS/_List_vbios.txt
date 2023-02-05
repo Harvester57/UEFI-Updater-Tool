@@ -7,6 +7,7 @@
 504349520210D815 vbios_15D8.dat pi "     OROM VBIOS Picasso          - "
 526176656E322047656E vbios_15DD_2.dat ra2 "     OROM VBIOS Raven 2          - "
 526176656E2047656E vbios_15DD_1.dat ra1 "     OROM VBIOS Raven            - "
+5043495202104E16 vbios_164E.dat rpl "     OROM VBIOS Raphael          - "
 
 # old
 5043495202107098 vbios_9870.dat ca "     OROM VBIOS Carrizo          - "
